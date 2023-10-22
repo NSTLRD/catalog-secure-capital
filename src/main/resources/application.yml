@@ -1,0 +1,8 @@
+spring:
+   profiles:
+     active: @spring.profiles.active@
+
+application:
+  title: Catalog Secure
+  description: Catalog Secure app for managing products and invoices
+  version: 1.0.0
