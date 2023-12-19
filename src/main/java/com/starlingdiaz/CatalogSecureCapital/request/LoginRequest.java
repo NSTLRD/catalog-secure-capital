@@ -9,6 +9,7 @@ package com.starlingdiaz.CatalogSecureCapital.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 public class LoginRequest {
@@ -16,4 +17,9 @@ public class LoginRequest {
     private String email;
     @NotEmpty(message = "Password cannot be empty")
     private String password;
+
+    public LoginRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }

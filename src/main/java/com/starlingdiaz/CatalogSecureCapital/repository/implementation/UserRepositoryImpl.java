@@ -7,6 +7,7 @@
 
 package com.starlingdiaz.CatalogSecureCapital.repository.implementation;
 
+import com.starlingdiaz.CatalogSecureCapital.dto.UserDTO;
 import com.starlingdiaz.CatalogSecureCapital.exception.ApiException;
 import com.starlingdiaz.CatalogSecureCapital.model.Role;
 import com.starlingdiaz.CatalogSecureCapital.model.User;
@@ -16,6 +17,7 @@ import com.starlingdiaz.CatalogSecureCapital.repository.UserRepository;
 import com.starlingdiaz.CatalogSecureCapital.rowmapper.UserRowMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -30,13 +32,17 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 
 import static com.starlingdiaz.CatalogSecureCapital.enumeration.RoleType.ROLE_USER;
 import static com.starlingdiaz.CatalogSecureCapital.enumeration.VerificationType.ACCOUNT;
 import static com.starlingdiaz.CatalogSecureCapital.query.UserQuery.*;
+import static com.starlingdiaz.CatalogSecureCapital.utils.SmsUtils.sendSMS;
 import static java.util.Map.of;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.time.DateUtils.addDays;
 
 @Repository
 @RequiredArgsConstructor
@@ -44,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 public class UserRepositoryImpl implements UserRepository<User>, UserDetailsService {
 
 
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private final NamedParameterJdbcTemplate jdbc;
     private final RoleRepository<Role> roleRepository;
     private final BCryptPasswordEncoder encoder;
@@ -142,5 +149,21 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
             log.error(exception.getMessage());
             throw new ApiException(INTERNAL_SERVER_ERROR_MESSAGE);
         }
+    }
+
+    @Override
+    public void sendVerificationCode(UserDTO user) {
+        String expirationDate = DateFormatUtils.format(addDays(new Date(),1), DATE_FORMAT);
+        //String verificationCode = randomAlphabetic(8).toUpperCase();
+        String verificationCode = randomAlphanumeric(8).toUpperCase();
+        try {
+           jdbc.update(DELETE_VERIFICATION_CODE_BY_USER_ID, of("id", user.getId()));
+           jdbc.update(INSERT_VERIFICATION_CODE_QUERY, of("userId", user.getId(), "code", verificationCode, "expirationDate", expirationDate));
+           //sendSMS(user.getPhone(), "Catalog Secure, Your verification code is: " + verificationCode);
+        } catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new ApiException(INTERNAL_SERVER_ERROR_MESSAGE);
+        }
+
     }
 }

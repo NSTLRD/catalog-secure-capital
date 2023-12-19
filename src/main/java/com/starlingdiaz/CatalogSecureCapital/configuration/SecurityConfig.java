@@ -36,7 +36,26 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
-    private static final String[] PUBLIC_URLS = { "/user/login/**", "user/register/**" };
+    private static final String[] PUBLIC_URLS = {
+            "/user/login/**",
+            "user/register/**",
+            "/doc/swagger-ui.html/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            "/webjars/**"
+    };
+
+    //swagger configuration
+    //url:http://localhost:8080/swagger-ui/
+    private static final String[] AUTH_WHITELIST = {
+            // -- swagger ui
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/webjars/**",
+            "/swagger-ui.html/**",
+    };
 
     //routes configuration
     @Bean
@@ -44,10 +63,13 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable).cors(withDefaults());
         http.sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
         http.authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_URLS).permitAll());
+        http.authorizeHttpRequests(request -> request.requestMatchers(AUTH_WHITELIST).permitAll());
         http.authorizeHttpRequests(request -> request.requestMatchers(DELETE, "/user/delete/**").hasAuthority("DELETE:USER"));
         http.authorizeHttpRequests(request -> request.requestMatchers(DELETE, "/customer/delete/**").hasAuthority("DELETE:CUSTOMER"));
         http.exceptionHandling(exception -> exception.accessDeniedHandler(customAccessDeniedHandler).authenticationEntryPoint(customAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
+
+
         return http.build();
     }
 
