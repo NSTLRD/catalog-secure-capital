@@ -1,5 +1,6 @@
 package com.starlingdiaz.CatalogSecureCapital.repository;
 
+import com.starlingdiaz.CatalogSecureCapital.dto.UserDTO;
 import com.starlingdiaz.CatalogSecureCapital.model.User;
 
 import java.util.Collection;
@@ -20,5 +21,6 @@ public interface UserRepository<T extends User> {
 
     /*More complex operations*/
     User getUserByEmail(String email);
+    void sendVerificationCode(UserDTO user);
 
 }
