@@ -17,9 +17,9 @@ import static com.twilio.rest.api.v2010.account.Message.creator;
 @Slf4j
 public class SmsUtils {
   //OBSERVATION YOU NEED TO BUY A TWILIO NUMBER TO USE IN THE PROJECT
-  private static final String FROM_NUMBER = "+16465028508";
-  private static final String SID_KEY = "ACf0af2c01bdc87d099f5d81d757a0a248";
-  public static final String TOKEN_KEY = "2ddc4013c8a75266204fcef1098f696e";
+  private static final String FROM_NUMBER = "<Your own number from Twilio>";
+  private static final String SID_KEY = "<Your own key>";
+  public static final String TOKEN_KEY = "<Your own key>";
 
   public static void sendSMS(String toNumber, String messageBody) {
       Twilio.init(SID_KEY, TOKEN_KEY);
